@@ -56,7 +56,7 @@ export default function RoomPage() {
     }
   }
 
-  // Function to add a film
+  // Function to add film
   async function addFilm(e: React.FormEvent) {
     e.preventDefault();
     if (!newFilm.trim()) return;
@@ -244,7 +244,7 @@ export default function RoomPage() {
           )}
         </div>
       </div>
-      
+
       <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
         {isHost && (
           <button
