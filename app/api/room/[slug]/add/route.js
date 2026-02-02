@@ -1,11 +1,10 @@
 import { supabase } from '../../../../supabase';
 import bcrypt from 'bcryptjs';
+import { NextResponse } from 'next/server';
 
-export default async function handler(req, res) {
-    if (req.method !== 'POST') return res.status(405).end();
-
-    const { slug } = req.query;
-    const { password, participants = [], films = [] } = req.body;
+export async function POST(request, { params }) {
+    const { slug } = await params;
+    const { password, participants = [], films = [] } = await request.json();
 
     const { data: room } = await supabase
         .from('rooms')
@@ -13,9 +12,13 @@ export default async function handler(req, res) {
         .eq('slug', slug)
         .single();
 
-    if (!room) return res.status(404).end();
-    if (!(await bcrypt.compare(password, room.password_hash)))
-        return res.status(403).end();
+    if (!room) {
+        return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+    }
+    
+    if (!(await bcrypt.compare(password, room.password_hash))) {
+        return NextResponse.json({ error: 'Invalid password' }, { status: 403 });
+    }
 
     if (participants.length) {
         await supabase.from('participants').insert(
@@ -29,5 +32,5 @@ export default async function handler(req, res) {
         );
     }
 
-    res.json({ ok: true });
+    return NextResponse.json({ ok: true });
 }
